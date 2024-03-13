@@ -1,49 +1,66 @@
 import { useEffect, useState } from "react";
 
 import "./App.css";
-import SingleProduct from "./components/SingleProduct/SingleProduct";
+import SingleProduct from "./SingleProduct";
 
 function App() {
-  const [name, setName] = useState("gias");
   const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);
 
-  let control = false;
+  const handleCart = (pd) => {
+    const isExists = cart.find((p) => p.id == pd.id);
+    if (!isExists) {
+      setCart([...cart, pd]);
+    } else {
+      alert("Cart already exists");
+    }
+  };
 
   useEffect(() => {
-    fetch("https://fakestoreapi.com/products")
+    fetch("./fakeData.json")
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
       });
   }, []);
 
-  // console.log(product);
-
-  const handleChange = () => {
-    setName("hero alom");
+  const handleRemove = (id) => {
+    const removeItem = cart.filter((item) => item.id != id);
+    setCart(removeItem);
   };
-
-  // const [stateCount, setStateCount] = useState(0);
-
-  // let count = 0;
-
-  // const handleVariableCount = () => {
-  //   count = count + 1;
-  // };
-  // const handleStateCount = () => {
-  //   const sum = stateCount + 1;
-  //   setStateCount(sum);
-  // };
-
-  // console.log(count);
 
   return (
     <>
-      <h1>Main APp js</h1>
+      <div className="main-container">
+        <div className="left-service-container">
+          <div className="cards">
+            {products.map((product) => (
+              <SingleProduct
+                handleCart={handleCart}
+                product={product}
+              ></SingleProduct>
+            ))}
+          </div>
+        </div>
+        <div className="cart-container">
+          <div className="cart">
+            <h3>Total Added product 0</h3>
 
-      {products.map((item, index) => (
-        <SingleProduct product={item} index={index}></SingleProduct>
-      ))}
+            <div className="cart-items">
+              <h5>Name</h5>
+              <h5>Price</h5>
+            </div>
+            <div className="added-item">
+              {cart.map((cp) => (
+                <>
+                  <p>{cp.title.slice(0, 25)}</p>
+                  <button onClick={(e) => handleRemove(cp.id)}>remove</button>
+                </>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
